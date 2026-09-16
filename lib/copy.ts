@@ -104,7 +104,8 @@ export const LANDING_DOWNLOADS = {
     'Bring your own OpenAI-compatible key or a local Ollama model. Nothing is billed through this site.',
     'The first launch may download embedding and TTS models into app data. Later launches reuse that cache.',
     'Unsigned macOS builds may trigger Gatekeeper. Right-click the app and choose Open, or allow it in System Settings → Privacy & Security.',
-    'Windows and Linux packages are not in this release yet.',
+    'Unsigned Windows builds may trigger SmartScreen. Choose Run anyway if Windows flags the installer.',
+    'Linux AppImage may need FUSE. The .deb is the fallback for Debian/Ubuntu-class systems.',
     'The app binds localhost:3001 and allows only one instance. Close other copies if the window fails to open.',
   ],
 } as const;
