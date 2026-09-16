@@ -1,0 +1,131 @@
+name: Electron installers
+
+# Checks out LOTM-GAME, packs unsigned Windows / macOS / Linux installers on
+# native runners, and attaches them to a GitHub Release on THIS repo (lotm-site).
+# Run from Actions → Electron installers → Run workflow.
+#
+# When LOTM-GAME is private, set repo secret LOTM_GAME_TOKEN (classic PAT, repo
+# scope) so this workflow can clone it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag on lotm-site to upload into
+        required: true
+        default: v2.0.0
+      game_ref:
+        description: LOTM-GAME branch, tag, or SHA to pack
+        required: true
+        default: main
+
+concurrency:
+  group: electron-${{ github.ref }}-${{ inputs.tag }}
+  cancel-in-progress: true
+
+jobs:
+  pack:
+    name: Pack ${{ matrix.pack }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            pack: win
+          - os: macos-latest
+            pack: mac
+          - os: ubuntu-22.04
+            pack: linux
+    steps:
+      - name: Checkout LOTM-GAME
+        uses: actions/checkout@v5
+        with:
+          repository: TheMagiche/LOTM-GAME
+          ref: ${{ inputs.game_ref }}
+          path: game
+          token: ${{ secrets.LOTM_GAME_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: game/package-lock.json
+
+      - name: Linux native build deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3 make g++
+
+      - name: Install dependencies
+        working-directory: game
+        run: npm ci --legacy-peer-deps
+
+      - name: Vite frontend
+        working-directory: game
+        run: npx vite build
+
+      - name: Server bundle
+        working-directory: game
+        run: npm run build:server
+
+      - name: Rebuild natives for Electron
+        working-directory: game
+        run: npm run electron:rebuild
+
+      - name: Pack Windows
+        if: matrix.pack == 'win'
+        working-directory: game
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: Pack macOS
+        if: matrix.pack == 'mac'
+        working-directory: game
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --mac --publish never
+
+      - name: Pack Linux
+        if: matrix.pack == 'linux'
+        working-directory: game
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --linux --x64 --publish never
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lotm-${{ matrix.pack }}
+          if-no-files-found: error
+          path: |
+            game/release/LOTM-*.exe
+            game/release/LOTM-*.dmg
+            game/release/LOTM-*.zip
+            game/release/LOTM-*.AppImage
+            game/release/LOTM-*.deb
+            game/release/LOTM-*.appimage
+
+      - name: Attach to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        shell: bash
+        working-directory: game
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(release/LOTM-*.exe release/LOTM-*.dmg release/LOTM-*.AppImage release/LOTM-*.deb)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No installer files to upload" >&2
+            exit 1
+          fi
+          if ! gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --notes "Desktop installers for Lord of the Mysteries." --repo "${{ github.repository }}"
+          fi
+          gh release upload "$TAG" "${files[@]}" --clobber --repo "${{ github.repository }}"

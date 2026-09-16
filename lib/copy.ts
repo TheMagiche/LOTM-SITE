@@ -1,10 +1,11 @@
-import { DEMO_URL, DISCORD_URL, GAME_REPO_URL } from './site';
+import { DEMO_URL, DISCORD_URL, RELEASES_URL, SOURCE_REPO_URL } from './site';
 
 export const LANDING_CREATOR_URL = 'https://themagiche.vercel.app';
 export const LANDING_SPONSOR_URL = 'https://ko-fi.com/themagiche';
 export const LANDING_ENGINE_REPO_URL = 'https://github.com/Sagesheep/NarrativeEngine-P';
 export const LANDING_WIKI_URL = 'https://lordofthemysteries.fandom.com/wiki/';
-export const LANDING_GAME_REPO_URL = GAME_REPO_URL;
+export const LANDING_GAME_REPO_URL = SOURCE_REPO_URL;
+export const LANDING_RELEASES_URL = RELEASES_URL;
 export const LANDING_DEMO_URL = DEMO_URL;
 export const LANDING_DISCORD_URL = DISCORD_URL;
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Monitor } from 'lucide-react';
-import { LANDING_DOWNLOADS, LANDING_GAME_REPO_URL } from '@/lib/copy';
+import { LANDING_DOWNLOADS, LANDING_RELEASES_URL } from '@/lib/copy';
 import { detectOs } from '@/lib/os';
 import {
   formatBytes,
@@ -24,7 +24,8 @@ function formatPublished(iso?: string): string {
 
 function fileKind(name: string): string {
   const ext = name.split('.').pop();
-  return ext ? ext.toUpperCase() : 'installer';
+  if (!ext || ext === name || ext.length > 8) return 'installer';
+  return ext.toUpperCase();
 }
 
 export function Downloads({ release }: { release: DesktopRelease }) {
@@ -36,7 +37,7 @@ export function Downloads({ release }: { release: DesktopRelease }) {
 
   const nativeBuild = os !== 'unknown' ? release.platforms[os] : undefined;
   const showPrimary = Boolean(nativeBuild?.primary);
-  const releasePage = release.htmlUrl || `${LANDING_GAME_REPO_URL}/releases`;
+  const releasePage = release.htmlUrl || LANDING_RELEASES_URL;
 
   const published = formatPublished(release.publishedAt);
   const missingPlatforms = PLATFORM_ORDER.filter((id) => !release.platforms[id].primary);

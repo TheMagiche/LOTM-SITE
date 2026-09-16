@@ -1,5 +1,5 @@
 import { LandingPage } from '@/components/LandingPage';
-import { fetchLatestDesktopRelease } from '@/lib/releases';
+import { fetchLatestDesktopRelease } from '@/lib/fetchRelease';
 
 export const revalidate = 300;
 

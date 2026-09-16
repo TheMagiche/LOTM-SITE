@@ -1,8 +1,8 @@
 # Lord of the Mysteries — download site
 
-Marketing site for desktop builds of the [LOTM-GAME](https://github.com/TheMagiche/LOTM-GAME) Electron app. No gameplay. Hosted on Vercel.
+Marketing site for desktop builds of Lord of the Mysteries. No gameplay. Hosted on Vercel.
 
-This repository is independent of the game repo. Keep it in a sibling folder named `lotm-site` if you develop next to the game; the game gitignores that path.
+This repository is independent of the private game source. It also hosts **GitHub Releases** (the `.exe` / `.dmg` / `.AppImage` / `.deb` files). Keep the folder named `lotm-site` next to the game if you develop locally; the game gitignores that path.
 
 ## Local development
 
@@ -18,32 +18,30 @@ npm run build
 npm start
 ```
 
-## Environment
+## Desktop installers
 
-Copy `.env.example` to `.env.local` as needed:
+Packaging still uses the LOTM-GAME tree (Electron, natives, `gamedata`). This repo’s workflow clones that tree, packs on Windows / macOS / Linux runners, and uploads into **this** repo’s Releases.
 
-| Variable | Purpose |
-|---|---|
-| `GITHUB_REPO` | Game repo to poll (`owner/name`). Default `TheMagiche/LOTM-GAME`. |
-| `GITHUB_TOKEN` | Optional GitHub token so Vercel is not limited to 60 unauthenticated API requests/hour. |
-| `NEXT_PUBLIC_GAME_REPO_URL` | Override the game GitHub URL. |
-| `NEXT_PUBLIC_DEMO_URL` | Hosted web demo. Default `https://lotmdnd.work.gd`. |
-| `NEXT_PUBLIC_DISCORD_URL` | Community Discord invite. |
+1. GitHub → **LOTM-SITE** → Actions → **Electron installers** → Run workflow.
+2. Tag defaults to `v2.0.0`. `game_ref` is the LOTM-GAME branch or SHA to pack (`main` by default).
+3. If LOTM-GAME is private, add a repo secret **`LOTM_GAME_TOKEN`** (classic PAT with `repo`) on LOTM-SITE so the workflow can clone it.
 
-Download buttons read `GET /repos/{GITHUB_REPO}/releases/latest` every 5 minutes (ISR). Windows maps `.exe`, macOS `.dmg` (zip fallback), Linux `.AppImage` then `.deb`. Every download CTA opens that GitHub Release page so visitors pick the installer there. If the latest release has none of those assets, the page shows **Coming soon**.
+Download buttons poll `GET /repos/TheMagiche/LOTM-SITE/releases/latest`. Every CTA opens that release page.
+
+## Environment (Vercel)
+
+Demo, Discord, and source URLs are hardcoded. Do **not** add `NEXT_PUBLIC_*` variables.
+
+| Variable | Vercel type | Purpose |
+|---|---|---|
+| `GITHUB_TOKEN` | **Sensitive** (no `NEXT_PUBLIC_` prefix) | Lets the Next server read this repo’s releases. Without it, GitHub often rate-limits Vercel. |
+
+Create a classic token at [GitHub tokens](https://github.com/settings/tokens) with `public_repo`. Vercel → Project → Settings → Environment Variables → Sensitive → Production (and Preview). Redeploy.
 
 ## GitHub + Vercel
 
-1. Create an empty GitHub repository (for example `TheMagiche/lotm-site`).
-2. From this folder:
+1. This folder is `TheMagiche/LOTM-SITE` and must stay **public** so visitors can download Release assets.
+2. Vercel: import that repo (not the LOTM-GAME monorepo). Framework: Next.js.
+3. Add `GITHUB_TOKEN`. Deploy.
 
-   ```bash
-   git remote add origin git@github.com:TheMagiche/lotm-site.git
-   git push -u origin main
-   ```
-
-3. In Vercel: **Add New Project** → import that GitHub repo. Framework preset: Next.js.
-4. Set `GITHUB_TOKEN` (recommended) and any `NEXT_PUBLIC_*` overrides in the Vercel project settings.
-5. Deploy. Attach a custom domain when you have one.
-
-Do not import this app as part of the LOTM-GAME monorepo on Vercel.
+LOTM-GAME can be private once installers live on this repo’s Releases.

@@ -1,4 +1,4 @@
-import { GAME_REPO, RELEASE_REVALIDATE_SECONDS, RELEASES_URL } from './site';
+import { RELEASES_URL } from './site';
 
 export type PlatformId = 'windows' | 'macos' | 'linux';
 
@@ -126,32 +126,4 @@ export function formatDigest(digest?: string): string {
   const value = digest.replace(/^sha256:/i, '');
   if (value.length <= 16) return digest;
   return `sha256:${value.slice(0, 12)}…`;
-}
-
-function githubHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'lotm-site',
-  };
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  }
-  return headers;
-}
-
-export async function fetchLatestDesktopRelease(): Promise<DesktopRelease> {
-  try {
-    const res = await fetch(`https://api.github.com/repos/${GAME_REPO}/releases/latest`, {
-      headers: githubHeaders(),
-      cache: 'force-cache',
-      next: { revalidate: RELEASE_REVALIDATE_SECONDS },
-    });
-    if (res.status === 404) return mapGithubRelease(null);
-    if (!res.ok) return mapGithubRelease(null);
-    const json = (await res.json()) as GithubRelease;
-    return mapGithubRelease(json);
-  } catch {
-    return mapGithubRelease(null);
-  }
 }
