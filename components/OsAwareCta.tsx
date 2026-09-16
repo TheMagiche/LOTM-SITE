@@ -24,7 +24,12 @@ export function OsAwareCta({
   return (
     <div className={variant === 'banner' ? 'lotm-landing-cta-actions' : 'lotm-landing-actions'}>
       {asset ? (
-        <a className="lotm-title-hub-primary" href={asset.url} download>
+        <a
+          className="lotm-title-hub-primary"
+          href={release.htmlUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
           Download for {native.label}
         </a>
       ) : (

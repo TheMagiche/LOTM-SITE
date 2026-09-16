@@ -128,7 +128,7 @@ export function formatDigest(digest?: string): string {
   return `sha256:${value.slice(0, 12)}…`;
 }
 
-export async function fetchLatestDesktopRelease(): Promise<DesktopRelease> {
+function githubHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
@@ -137,10 +137,13 @@ export async function fetchLatestDesktopRelease(): Promise<DesktopRelease> {
   if (process.env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
+  return headers;
+}
 
+export async function fetchLatestDesktopRelease(): Promise<DesktopRelease> {
   try {
     const res = await fetch(`https://api.github.com/repos/${GAME_REPO}/releases/latest`, {
-      headers,
+      headers: githubHeaders(),
       cache: 'force-cache',
       next: { revalidate: RELEASE_REVALIDATE_SECONDS },
     });

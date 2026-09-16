@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Monitor } from 'lucide-react';
-import {
-  LANDING_DOWNLOADS,
-  LANDING_GAME_REPO_URL,
-} from '@/lib/copy';
+import { LANDING_DOWNLOADS, LANDING_GAME_REPO_URL } from '@/lib/copy';
 import { detectOs } from '@/lib/os';
 import {
   formatBytes,
@@ -39,6 +36,7 @@ export function Downloads({ release }: { release: DesktopRelease }) {
 
   const nativeBuild = os !== 'unknown' ? release.platforms[os] : undefined;
   const showPrimary = Boolean(nativeBuild?.primary);
+  const releasePage = release.htmlUrl || `${LANDING_GAME_REPO_URL}/releases`;
 
   const published = formatPublished(release.publishedAt);
   const missingPlatforms = PLATFORM_ORDER.filter((id) => !release.platforms[id].primary);
@@ -71,8 +69,9 @@ export function Downloads({ release }: { release: DesktopRelease }) {
           <div className="lotm-landing-download-primary">
             <a
               className="lotm-title-hub-primary"
-              href={nativeBuild.primary.url}
-              download
+              href={releasePage}
+              target="_blank"
+              rel="noreferrer"
             >
               Download for {nativeBuild.label}
             </a>
@@ -97,11 +96,21 @@ export function Downloads({ release }: { release: DesktopRelease }) {
                         {asset.size ? ` · ${formatBytes(asset.size)}` : ''}
                         {asset.digest ? ` · ${formatDigest(asset.digest)}` : ''}
                       </p>
-                      <a className="lotm-landing-platform-link" href={asset.url} download>
+                      <a
+                        className="lotm-landing-platform-link"
+                        href={releasePage}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Download {fileKind(asset.name)}
                       </a>
                       {platform.secondary && (
-                        <a className="lotm-landing-platform-link" href={platform.secondary.url} download>
+                        <a
+                          className="lotm-landing-platform-link"
+                          href={releasePage}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Also {fileKind(platform.secondary.name)}
                         </a>
                       )}
@@ -134,12 +143,12 @@ export function Downloads({ release }: { release: DesktopRelease }) {
 
         <div className="lotm-landing-card-action lotm-landing-releases-link">
           <a
-            href={release.htmlUrl || `${LANDING_GAME_REPO_URL}/releases`}
+            href={releasePage}
             target="_blank"
             rel="noreferrer"
             className="lotm-landing-link"
           >
-            All GitHub Releases
+            GitHub Release
           </a>
         </div>
       </div>

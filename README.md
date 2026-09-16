@@ -30,7 +30,7 @@ Copy `.env.example` to `.env.local` as needed:
 | `NEXT_PUBLIC_DEMO_URL` | Hosted web demo. Default `https://lotmdnd.work.gd`. |
 | `NEXT_PUBLIC_DISCORD_URL` | Community Discord invite. |
 
-Download buttons read `GET /repos/{GITHUB_REPO}/releases/latest` every 5 minutes (ISR). Windows maps `.exe`, macOS `.dmg` (zip fallback), Linux `.AppImage` then `.deb`. If the latest release has none of those assets, the page shows **Coming soon**.
+Download buttons read `GET /repos/{GITHUB_REPO}/releases/latest` every 5 minutes (ISR). Windows maps `.exe`, macOS `.dmg` (zip fallback), Linux `.AppImage` then `.deb`. Every download CTA opens that GitHub Release page so visitors pick the installer there. If the latest release has none of those assets, the page shows **Coming soon**.
 
 ## GitHub + Vercel
 
