@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-garamond);
+  --font-serif: var(--font-cinzel);
+}
+
+html,
+body {
+  background: #0b0a0d;
+  color: #f3ead8;
+}
