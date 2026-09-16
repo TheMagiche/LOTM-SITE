@@ -92,6 +92,8 @@ export const LANDING_DOWNLOADS = {
   leadSoon:
     'Native Windows, macOS, and Linux packages are on the roadmap. Until GitHub Releases publish installers, use the web demo or run from source.',
   leadReady: 'Install the local-first desktop app. Campaigns stay on your machine; you bring your own LLM key.',
+  leadMacFirst:
+    'macOS is available now. Windows and Linux installers follow. Campaigns stay on your machine; you bring your own LLM key.',
   platforms: [
     { id: 'windows', label: 'Windows' },
     { id: 'macos', label: 'macOS' },
@@ -101,8 +103,8 @@ export const LANDING_DOWNLOADS = {
   notes: [
     'Bring your own OpenAI-compatible key or a local Ollama model. Nothing is billed through this site.',
     'The first launch may download embedding and TTS models into app data. Later launches reuse that cache.',
-    'Unsigned builds may trigger Gatekeeper or SmartScreen until code signing is in place. Prefer the official GitHub Release assets.',
-    'Windows may require the Visual C++ redistributable. Linux AppImage needs FUSE on some distros; a .deb is offered when available.',
+    'Unsigned macOS builds may trigger Gatekeeper. Right-click the app and choose Open, or allow it in System Settings → Privacy & Security.',
+    'Windows and Linux packages are not in this release yet.',
     'The app binds localhost:3001 and allows only one instance. Close other copies if the window fails to open.',
   ],
 } as const;

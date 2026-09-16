@@ -40,6 +40,7 @@ import { SITE_PATHWAYS, type SitePathway } from '@/lib/pathways';
 import type { DesktopRelease } from '@/lib/releases';
 import { Downloads } from './Downloads';
 import { LandingLoader } from './LandingLoader';
+import { OsAwareCta } from './OsAwareCta';
 
 const PILLAR_ICONS: Record<string, ReactNode> = {
   'acting-method': <Flame className="w-5 h-5 text-amber-400" />,
@@ -197,19 +198,7 @@ export function LandingPage({ release }: { release: DesktopRelease }) {
           <h1 className="lotm-landing-title">{LANDING_HERO.brand}</h1>
           <p className="lotm-landing-sub">{LANDING_HERO.sub}</p>
 
-          <div className="lotm-landing-actions">
-            <a href="#downloads" className="lotm-title-hub-primary">
-              {LANDING_HERO.cta}
-            </a>
-            <a
-              href={LANDING_DEMO_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="lotm-title-hub-ghost"
-            >
-              {LANDING_HERO.demoCta}
-            </a>
-          </div>
+          <OsAwareCta release={release} />
 
           <div className="lotm-hero-showcase-bar">
             <div className="lotm-showcase-tabs">
@@ -467,19 +456,7 @@ export function LandingPage({ release }: { release: DesktopRelease }) {
             <p className="lotm-landing-cta-sub">
               Explore the Fifth Epoch, commune with the fog, and protect your sanity.
             </p>
-            <div className="lotm-landing-cta-actions">
-              <a href="#downloads" className="lotm-title-hub-primary">
-                {LANDING_HERO.cta}
-              </a>
-              <a
-                href={LANDING_DEMO_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="lotm-title-hub-ghost"
-              >
-                {LANDING_HERO.demoCta}
-              </a>
-            </div>
+            <OsAwareCta release={release} variant="banner" />
           </div>
         </section>
       </main>

@@ -6,6 +6,7 @@ import {
   LANDING_DOWNLOADS,
   LANDING_GAME_REPO_URL,
 } from '@/lib/copy';
+import { detectOs } from '@/lib/os';
 import {
   formatBytes,
   formatDigest,
@@ -14,15 +15,6 @@ import {
 } from '@/lib/releases';
 
 const PLATFORM_ORDER: PlatformId[] = ['windows', 'macos', 'linux'];
-
-function detectOs(): PlatformId | 'unknown' {
-  if (typeof navigator === 'undefined') return 'unknown';
-  const ua = navigator.userAgent;
-  if (/Windows/i.test(ua)) return 'windows';
-  if (/Mac OS X|Macintosh/i.test(ua)) return 'macos';
-  if (/Linux|X11/i.test(ua)) return 'linux';
-  return 'unknown';
-}
 
 function formatPublished(iso?: string): string {
   if (!iso) return '';
@@ -45,12 +37,16 @@ export function Downloads({ release }: { release: DesktopRelease }) {
     setOs(detectOs());
   }, []);
 
-  const preferred =
-    (os !== 'unknown' && release.platforms[os].primary
-      ? release.platforms[os]
-      : PLATFORM_ORDER.map((id) => release.platforms[id]).find((p) => p.primary)) || undefined;
+  const nativeBuild = os !== 'unknown' ? release.platforms[os] : undefined;
+  const showPrimary = Boolean(nativeBuild?.primary);
 
   const published = formatPublished(release.publishedAt);
+  const missingPlatforms = PLATFORM_ORDER.filter((id) => !release.platforms[id].primary);
+  const lead = !release.hasArtifacts
+    ? LANDING_DOWNLOADS.leadSoon
+    : missingPlatforms.length > 0
+      ? LANDING_DOWNLOADS.leadMacFirst
+      : LANDING_DOWNLOADS.leadReady;
 
   return (
     <section className="lotm-landing-section" id="downloads" aria-labelledby="section-downloads-title">
@@ -67,18 +63,18 @@ export function Downloads({ release }: { release: DesktopRelease }) {
           </span>
         </div>
         <p className="lotm-landing-card-body">
-          {release.hasArtifacts ? LANDING_DOWNLOADS.leadReady : LANDING_DOWNLOADS.leadSoon}
+          {lead}
           {release.hasArtifacts && published ? ` Latest release published ${published}.` : ''}
         </p>
 
-        {release.hasArtifacts && preferred?.primary && (
+        {showPrimary && nativeBuild?.primary && (
           <div className="lotm-landing-download-primary">
             <a
               className="lotm-title-hub-primary"
-              href={preferred.primary.url}
+              href={nativeBuild.primary.url}
               download
             >
-              Download for {preferred.label}
+              Download for {nativeBuild.label}
             </a>
           </div>
         )}
