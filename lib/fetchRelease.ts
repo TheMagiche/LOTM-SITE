@@ -52,6 +52,10 @@ export function fallbackDesktopRelease(): DesktopRelease {
         id: 'macos',
         label: PLATFORM_LABELS.macos.label,
         primary: { name: PLATFORM_LABELS.macos.name, url: htmlUrl, size: 0 },
+        variants: {
+          arm64: { name: 'macOS Apple Silicon installer', url: htmlUrl, size: 0 },
+          x64: { name: 'macOS Intel installer', url: htmlUrl, size: 0 },
+        },
       },
       linux: {
         id: 'linux',

@@ -104,6 +104,7 @@ export const LANDING_DOWNLOADS = {
   notes: [
     'Bring your own OpenAI-compatible key or a local Ollama model. Nothing is billed through this site.',
     'The first launch may download embedding and TTS models into app data. Later launches reuse that cache.',
+    'Apple Silicon Macs use the mac-arm64 DMG. Intel Macs (2013–2020, 64-bit) use mac-x64 — the Apple Silicon build will not open on Intel. macOS 12+ is required; 32-bit Macs are not supported.',
     'Unsigned macOS builds may trigger Gatekeeper. Right-click the app and choose Open, or allow it in System Settings → Privacy & Security.',
     'Unsigned Windows builds may trigger SmartScreen. Choose Run anyway if Windows flags the installer.',
     'Linux AppImage may need FUSE. The .deb is the fallback for Debian/Ubuntu-class systems.',

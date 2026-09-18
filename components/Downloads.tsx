@@ -3,15 +3,24 @@
 import { useEffect, useState } from 'react';
 import { Monitor } from 'lucide-react';
 import { LANDING_DOWNLOADS, LANDING_RELEASES_URL } from '@/lib/copy';
-import { detectOs } from '@/lib/os';
+import { detectMacArch, detectOs } from '@/lib/os';
 import {
   formatBytes,
   formatDigest,
+  macAssetForArch,
+  macDownloadLabel,
+  type CpuArch,
   type DesktopRelease,
   type PlatformId,
+  type ReleaseAsset,
 } from '@/lib/releases';
 
-const PLATFORM_ORDER: PlatformId[] = ['windows', 'macos', 'linux'];
+type DisplayPlatform = {
+  id: string;
+  label: string;
+  asset?: ReleaseAsset;
+  secondary?: ReleaseAsset;
+};
 
 function formatPublished(iso?: string): string {
   if (!iso) return '';
@@ -28,19 +37,55 @@ function fileKind(name: string): string {
   return ext.toUpperCase();
 }
 
+function displayPlatforms(release: DesktopRelease): DisplayPlatform[] {
+  const windows = release.platforms.windows;
+  const linux = release.platforms.linux;
+  const macos = release.platforms.macos;
+  const macCards: DisplayPlatform[] = macos.variants
+    ? [
+        { id: 'macos-arm64', label: 'macOS (Apple Silicon)', asset: macos.variants.arm64 },
+        { id: 'macos-x64', label: 'macOS (Intel)', asset: macos.variants.x64 },
+      ]
+    : [{ id: 'macos', label: macos.label, asset: macos.primary, secondary: macos.secondary }];
+
+  return [
+    { id: 'windows', label: windows.label, asset: windows.primary, secondary: windows.secondary },
+    ...macCards,
+    { id: 'linux', label: linux.label, asset: linux.primary, secondary: linux.secondary },
+  ];
+}
+
 export function Downloads({ release }: { release: DesktopRelease }) {
   const [os, setOs] = useState<PlatformId | 'unknown'>('unknown');
+  const [macArch, setMacArch] = useState<CpuArch | 'unknown' | 'pending'>('pending');
 
   useEffect(() => {
-    setOs(detectOs());
+    const detected = detectOs();
+    setOs(detected);
+    if (detected === 'macos') {
+      void detectMacArch().then(setMacArch);
+    } else {
+      setMacArch('unknown');
+    }
   }, []);
 
-  const nativeBuild = os !== 'unknown' ? release.platforms[os] : undefined;
-  const showPrimary = Boolean(nativeBuild?.primary);
+  const macosBuild = release.platforms.macos;
+  const nativeBuild = os !== 'unknown' && os !== 'macos' ? release.platforms[os] : undefined;
+  const nativeAsset =
+    os === 'macos'
+      ? macArch === 'pending'
+        ? undefined
+        : macAssetForArch(macosBuild, macArch)
+      : nativeBuild?.primary;
+  const nativeLabel = os === 'macos' ? macDownloadLabel(macArch === 'pending' ? 'unknown' : macArch) : nativeBuild?.label;
+  const showPrimary = Boolean(nativeAsset);
   const releasePage = release.htmlUrl || LANDING_RELEASES_URL;
+  const platforms = displayPlatforms(release);
 
   const published = formatPublished(release.publishedAt);
-  const missingPlatforms = PLATFORM_ORDER.filter((id) => !release.platforms[id].primary);
+  const missingPlatforms = (['windows', 'macos', 'linux'] as PlatformId[]).filter(
+    (id) => !release.platforms[id].primary,
+  );
   const lead = !release.hasArtifacts
     ? LANDING_DOWNLOADS.leadSoon
     : missingPlatforms.length > 0
@@ -66,27 +111,26 @@ export function Downloads({ release }: { release: DesktopRelease }) {
           {release.hasArtifacts && published ? ` Latest release published ${published}.` : ''}
         </p>
 
-        {showPrimary && nativeBuild?.primary && (
+        {showPrimary && nativeAsset && (
           <div className="lotm-landing-download-primary">
             <a
               className="lotm-title-hub-primary"
-              href={releasePage}
+              href={nativeAsset.url || releasePage}
               target="_blank"
               rel="noreferrer"
             >
-              Download for {nativeBuild.label}
+              Download for {nativeLabel}
             </a>
           </div>
         )}
 
         {release.hasArtifacts ? (
           <div className="lotm-landing-platform-cards">
-            {PLATFORM_ORDER.map((id) => {
-              const platform = release.platforms[id];
-              const asset = platform.primary;
+            {platforms.map((platform) => {
+              const asset = platform.asset;
               return (
                 <div
-                  key={id}
+                  key={platform.id}
                   className={`lotm-landing-platform-card${asset ? ' is-ready' : ''}`}
                 >
                   <p className="lotm-landing-platform-label">{platform.label}</p>
@@ -99,7 +143,7 @@ export function Downloads({ release }: { release: DesktopRelease }) {
                       </p>
                       <a
                         className="lotm-landing-platform-link"
-                        href={releasePage}
+                        href={asset.url || releasePage}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -108,7 +152,7 @@ export function Downloads({ release }: { release: DesktopRelease }) {
                       {platform.secondary && (
                         <a
                           className="lotm-landing-platform-link"
-                          href={releasePage}
+                          href={platform.secondary.url || releasePage}
                           target="_blank"
                           rel="noreferrer"
                         >

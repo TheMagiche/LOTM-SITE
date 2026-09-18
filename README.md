@@ -23,8 +23,9 @@ npm start
 Packaging still uses the LOTM-GAME tree (Electron, natives, `gamedata`). This repo’s workflow clones that tree, packs on Windows / macOS / Linux runners, and uploads into **this** repo’s Releases.
 
 1. GitHub → **LOTM-SITE** → Actions → **Electron installers** → Run workflow.
-2. Tag defaults to `v2.0.0`. `game_ref` is the LOTM-GAME branch or SHA to pack (`main` by default).
-3. If LOTM-GAME is private, add a repo secret **`LOTM_GAME_TOKEN`** (classic PAT with `repo`) on LOTM-SITE so the workflow can clone it.
+2. Tag defaults to `v2.0.1`. `game_ref` is the LOTM-GAME branch or SHA to pack (`main` by default).
+3. macOS is packed twice: Apple Silicon on `macos-latest` (`--mac --arm64`) and Intel on `macos-15-intel` (`--mac --x64`). Native modules are rebuilt on each runner.
+4. If LOTM-GAME is private, add a repo secret **`LOTM_GAME_TOKEN`** (classic PAT with `repo`) on LOTM-SITE so the workflow can clone it.
 
 Download buttons poll `GET /repos/TheMagiche/LOTM-SITE/releases/latest`. Every CTA opens that release page.
 

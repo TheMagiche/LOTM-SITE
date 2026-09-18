@@ -1,6 +1,7 @@
 import { RELEASES_URL } from './site';
 
 export type PlatformId = 'windows' | 'macos' | 'linux';
+export type CpuArch = 'arm64' | 'x64';
 
 export interface ReleaseAsset {
   name: string;
@@ -14,6 +15,7 @@ export interface PlatformBuild {
   label: string;
   primary?: ReleaseAsset;
   secondary?: ReleaseAsset;
+  variants?: Partial<Record<CpuArch, ReleaseAsset>>;
 }
 
 export interface DesktopRelease {
@@ -67,6 +69,13 @@ function toAsset(raw: GithubAsset): ReleaseAsset | undefined {
   };
 }
 
+export function archFromAssetName(name: string): CpuArch | undefined {
+  const lower = name.toLowerCase();
+  if (/\b(arm64|aarch64)\b/.test(lower)) return 'arm64';
+  if (/\b(x64|x86_64|amd64|intel)\b/.test(lower)) return 'x64';
+  return undefined;
+}
+
 function classify(name: string): { platform: PlatformId; rank: number } | undefined {
   const lower = name.toLowerCase();
   if (lower.endsWith('.exe') || lower.endsWith('.msi')) return { platform: 'windows', rank: 0 };
@@ -98,6 +107,15 @@ export function mapGithubRelease(release: GithubRelease | null): DesktopRelease 
     const sorted = ranked[id].sort((a, b) => a.rank - b.rank);
     platforms[id].primary = sorted[0]?.asset;
     platforms[id].secondary = sorted[1]?.asset;
+
+    if (id === 'macos') {
+      const variants: Partial<Record<CpuArch, ReleaseAsset>> = {};
+      for (const entry of sorted.filter((item) => item.rank === 0)) {
+        const arch = archFromAssetName(entry.asset.name);
+        if (arch && !variants[arch]) variants[arch] = entry.asset;
+      }
+      if (variants.arm64 || variants.x64) platforms[id].variants = variants;
+    }
   }
 
   const hasArtifacts = Object.values(platforms).some((p) => Boolean(p.primary));
@@ -110,6 +128,22 @@ export function mapGithubRelease(release: GithubRelease | null): DesktopRelease 
     platforms,
     hasArtifacts,
   };
+}
+
+export function macAssetForArch(
+  platform: PlatformBuild,
+  arch: CpuArch | 'unknown',
+): ReleaseAsset | undefined {
+  if (arch !== 'unknown' && platform.variants?.[arch]) return platform.variants[arch];
+  if (arch === 'x64' && platform.variants && !platform.variants.x64) return undefined;
+  if (arch === 'arm64' && platform.variants && !platform.variants.arm64) return undefined;
+  return platform.primary;
+}
+
+export function macDownloadLabel(arch: CpuArch | 'unknown'): string {
+  if (arch === 'x64') return 'macOS (Intel)';
+  if (arch === 'arm64') return 'macOS (Apple Silicon)';
+  return 'macOS';
 }
 
 export function formatBytes(size: number): string {
