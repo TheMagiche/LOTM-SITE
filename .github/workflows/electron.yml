@@ -4,6 +4,9 @@ name: Electron installers
 # native runners, and attaches them to a GitHub Release on THIS repo (lotm-site).
 # Run from Actions → Electron installers → Run workflow.
 #
+# macOS ships two DMGs: Apple Silicon (macos-latest) and Intel x64
+# (macos-15-intel). Native addons must be rebuilt on matching hardware.
+#
 # When LOTM-GAME is private, set repo secret LOTM_GAME_TOKEN (classic PAT, repo
 # scope) so this workflow can clone it.
 
@@ -13,7 +16,7 @@ on:
       tag:
         description: Release tag on lotm-site to upload into
         required: true
-        default: v2.0.0
+        default: v2.0.1
       game_ref:
         description: LOTM-GAME branch, tag, or SHA to pack
         required: true
@@ -36,10 +39,16 @@ jobs:
         include:
           - os: windows-latest
             pack: win
+            builder: --win --x64
           - os: macos-latest
-            pack: mac
+            pack: mac-arm64
+            builder: --mac --arm64
+          - os: macos-15-intel
+            pack: mac-x64
+            builder: --mac --x64
           - os: ubuntu-22.04
             pack: linux
+            builder: --linux --x64
     steps:
       - name: Checkout LOTM-GAME
         uses: actions/checkout@v5
@@ -77,26 +86,11 @@ jobs:
         working-directory: game
         run: npm run electron:rebuild
 
-      - name: Pack Windows
-        if: matrix.pack == 'win'
+      - name: Pack installer
         working-directory: game
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npx electron-builder --win --x64 --publish never
-
-      - name: Pack macOS
-        if: matrix.pack == 'mac'
-        working-directory: game
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npx electron-builder --mac --publish never
-
-      - name: Pack Linux
-        if: matrix.pack == 'linux'
-        working-directory: game
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npx electron-builder --linux --x64 --publish never
+        run: npx electron-builder ${{ matrix.builder }} --publish never
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
@@ -125,7 +119,15 @@ jobs:
             echo "No installer files to upload" >&2
             exit 1
           fi
+          notes='Desktop installers for Lord of the Mysteries.
+
+- Windows x64 (.exe)
+- macOS Apple Silicon (.dmg, mac-arm64)
+- macOS Intel (.dmg, mac-x64) — required on 2013–2020 Intel Macs
+- Linux x64 (.AppImage and .deb)
+
+Intel Macs cannot run the Apple Silicon build. 64-bit macOS 12+ is required; 32-bit Macs are not supported.'
           if ! gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            gh release create "$TAG" --title "$TAG" --notes "Desktop installers for Lord of the Mysteries." --repo "${{ github.repository }}"
+            gh release create "$TAG" --title "$TAG" --notes "$notes" --repo "${{ github.repository }}"
           fi
           gh release upload "$TAG" "${files[@]}" --clobber --repo "${{ github.repository }}"
