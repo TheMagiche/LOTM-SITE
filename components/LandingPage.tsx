@@ -31,7 +31,6 @@ import {
   LANDING_FOOTER,
   LANDING_CREATOR_URL,
   LANDING_SPONSOR_URL,
-  LANDING_DEMO_URL,
   LANDING_DISCORD_URL,
   LANDING_GAME_REPO_URL,
   type CollageCardItem,
@@ -493,14 +492,6 @@ export function LandingPage({ release }: { release: DesktopRelease }) {
               className="lotm-landing-footer-link"
             >
               Discord
-            </a>
-            <a
-              href={LANDING_DEMO_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="lotm-landing-footer-link"
-            >
-              Web demo
             </a>
             <a href="#downloads" className="lotm-landing-footer-link">
               Downloads

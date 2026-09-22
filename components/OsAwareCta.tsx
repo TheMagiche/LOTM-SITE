@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LANDING_DEMO_URL, LANDING_HERO } from '@/lib/copy';
+import { LANDING_HERO } from '@/lib/copy';
 import { detectMacArch, detectOs } from '@/lib/os';
 import {
   macAssetForArch,
@@ -56,14 +56,6 @@ export function OsAwareCta({
           {release.hasArtifacts ? 'See desktop downloads' : LANDING_HERO.cta}
         </a>
       )}
-      <a
-        href={LANDING_DEMO_URL}
-        target="_blank"
-        rel="noreferrer"
-        className="lotm-title-hub-ghost"
-      >
-        {LANDING_HERO.demoCta}
-      </a>
     </div>
   );
 }

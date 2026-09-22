@@ -1,4 +1,4 @@
-import { DEMO_URL, DISCORD_URL, RELEASES_URL, SOURCE_REPO_URL } from './site';
+import { DISCORD_URL, RELEASES_URL, SOURCE_REPO_URL } from './site';
 
 export const LANDING_CREATOR_URL = 'https://themagiche.vercel.app';
 export const LANDING_SPONSOR_URL = 'https://ko-fi.com/themagiche';
@@ -6,7 +6,6 @@ export const LANDING_ENGINE_REPO_URL = 'https://github.com/Sagesheep/NarrativeEn
 export const LANDING_WIKI_URL = 'https://lordofthemysteries.fandom.com/wiki/';
 export const LANDING_GAME_REPO_URL = SOURCE_REPO_URL;
 export const LANDING_RELEASES_URL = RELEASES_URL;
-export const LANDING_DEMO_URL = DEMO_URL;
 export const LANDING_DISCORD_URL = DISCORD_URL;
 
 export const LANDING_HERO = {
@@ -14,7 +13,6 @@ export const LANDING_HERO = {
   brand: 'Lord of the Mysteries',
   sub: 'A Victorian occult chronicle. Join the world of Beyonders.',
   cta: 'Download for your OS',
-  demoCta: 'Try the web demo',
 } as const;
 
 export const LANDING_LOADER = {
@@ -91,7 +89,7 @@ export const LANDING_SELF_HOST = {
 export const LANDING_DOWNLOADS = {
   heading: 'Desktop builds',
   leadSoon:
-    'Native Windows, macOS, and Linux packages are on the roadmap. Until GitHub Releases publish installers, use the web demo or run from source.',
+    'Native Windows, macOS, and Linux packages are on the roadmap. Until GitHub Releases publish installers, clone the repository and run from source.',
   leadReady: 'Install the local-first desktop app. Campaigns stay on your machine; you bring your own LLM key.',
   leadMacFirst:
     'macOS is available now. Windows and Linux installers follow. Campaigns stay on your machine; you bring your own LLM key.',
