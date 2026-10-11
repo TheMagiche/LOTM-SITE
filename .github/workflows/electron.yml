@@ -39,16 +39,16 @@ jobs:
         include:
           - os: windows-latest
             pack: win
-            builder: --win --x64
+            builder: "--win --x64"
           - os: macos-latest
             pack: mac-arm64
-            builder: --mac --arm64
+            builder: "--mac --arm64"
           - os: macos-15-intel
             pack: mac-x64
-            builder: --mac --x64
+            builder: "--mac --x64"
           - os: ubuntu-22.04
             pack: linux
-            builder: --linux --x64
+            builder: "--linux --x64"
     steps:
       - name: Checkout LOTM-GAME
         uses: actions/checkout@v5
