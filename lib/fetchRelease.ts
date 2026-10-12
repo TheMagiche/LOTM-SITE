@@ -11,6 +11,7 @@ interface GithubAsset {
 interface GithubRelease {
   tag_name?: string;
   name?: string;
+  body?: string;
   html_url?: string;
   published_at?: string;
   draft?: boolean;

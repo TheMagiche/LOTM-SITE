@@ -1019,6 +1019,23 @@
   pointer-events: none;
 }
 
+.lotm-landing-changes {
+  margin-top: 18px;
+}
+
+.lotm-landing-changes-title {
+  margin: 0;
+  font-family: var(--font-cinzel), Palatino, serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e0c36a;
+}
+
+.lotm-landing-changes .lotm-landing-notes {
+  margin-top: 10px;
+}
+
 .lotm-landing-notes {
   margin: 22px 0 0;
   padding-left: 18px;

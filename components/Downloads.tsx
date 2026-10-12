@@ -9,6 +9,7 @@ import {
   formatDigest,
   macAssetForArch,
   macDownloadLabel,
+  releaseHighlights,
   type CpuArch,
   type DesktopRelease,
   type PlatformId,
@@ -83,6 +84,7 @@ export function Downloads({ release }: { release: DesktopRelease }) {
   const platforms = displayPlatforms(release);
 
   const published = formatPublished(release.publishedAt);
+  const changes = releaseHighlights(release.notes);
   const missingPlatforms = (['windows', 'macos', 'linux'] as PlatformId[]).filter(
     (id) => !release.platforms[id].primary,
   );
@@ -110,6 +112,17 @@ export function Downloads({ release }: { release: DesktopRelease }) {
           {lead}
           {release.hasArtifacts && published ? ` Latest release published ${published}.` : ''}
         </p>
+
+        {changes.length > 0 && (
+          <div className="lotm-landing-changes">
+            <h4 className="lotm-landing-changes-title">What&apos;s new</h4>
+            <ul className="lotm-landing-notes">
+              {changes.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {showPrimary && nativeAsset && (
           <div className="lotm-landing-download-primary">

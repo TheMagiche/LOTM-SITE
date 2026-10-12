@@ -22,6 +22,8 @@ export interface DesktopRelease {
   tag?: string;
   name?: string;
   publishedAt?: string;
+  /** GitHub release body. The download page lists its markdown bullets as what's new. */
+  notes?: string;
   htmlUrl: string;
   platforms: Record<PlatformId, PlatformBuild>;
   hasArtifacts: boolean;
@@ -37,6 +39,7 @@ interface GithubAsset {
 interface GithubRelease {
   tag_name?: string;
   name?: string;
+  body?: string;
   html_url?: string;
   published_at?: string;
   assets?: GithubAsset[];
@@ -124,10 +127,21 @@ export function mapGithubRelease(release: GithubRelease | null): DesktopRelease 
     tag: release?.tag_name,
     name: release?.name || release?.tag_name,
     publishedAt: release?.published_at,
+    notes: release?.body,
     htmlUrl: release?.html_url || RELEASES_URL,
     platforms,
     hasArtifacts,
   };
+}
+
+/** Markdown list items from a GitHub release body, in order. */
+export function releaseHighlights(notes?: string): string[] {
+  if (!notes) return [];
+  return notes
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => /^[-*]\s+\S/.test(line))
+    .map((line) => line.replace(/^[-*]\s+/, '').trim());
 }
 
 export function macAssetForArch(
