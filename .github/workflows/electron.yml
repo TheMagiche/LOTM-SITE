@@ -121,12 +121,12 @@ jobs:
           fi
           notes='Desktop installers for Lord of the Mysteries.
 
-- Windows x64 (.exe)
-- macOS Apple Silicon (.dmg, mac-arm64)
-- macOS Intel (.dmg, mac-x64) — required on 2013–2020 Intel Macs
-- Linux x64 (.AppImage and .deb)
+          - Windows x64 (.exe)
+          - macOS Apple Silicon (.dmg, mac-arm64)
+          - macOS Intel (.dmg, mac-x64) — required on 2013–2020 Intel Macs
+          - Linux x64 (.AppImage and .deb)
 
-Intel Macs cannot run the Apple Silicon build. 64-bit macOS 12+ is required; 32-bit Macs are not supported.'
+          Intel Macs cannot run the Apple Silicon build. 64-bit macOS 12+ is required; 32-bit Macs are not supported.'
           if ! gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             gh release create "$TAG" --title "$TAG" --notes "$notes" --repo "${{ github.repository }}"
           fi
